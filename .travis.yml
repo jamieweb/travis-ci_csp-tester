@@ -2,19 +2,44 @@ language: php
 php:
   - 7.2
 before_install:
+#Install Apache
 - sudo apt update
 - sudo apt install apache2
+
+#Install headless-chrome-crawler using the yarn package manager
 - yarn add --ignore-engines headless-chrome-crawler
+
+#Enable mod_headers and mod_proxy_http
 - sudo a2enmod headers proxy_http
+
+#Set up Apache as a reverse proxy (this is used to add the CSP header)
 - printf "ProxyPass \"/\" \"http://localhost:8080/\"\nProxyPassReverse \"/\" \"http://localhost:8080/\"\n" | sudo tee /etc/apache2/conf-available/csp.conf
-- cat .travis-ci/csp.txt | sudo tee -a /etc/apache2/conf-available/csp.conf
+
+#Add your CSP to the Apache config
+- cat csp.txt | sudo tee -a /etc/apache2/conf-available/csp.conf
 - sudo a2enconf csp.conf
 - sudo service apache2 restart
+
+#Set up the PHP built-in server to host your content locally
 before_script:
-- printf "<?php file_put_contents('csp-reports.txt', json_encode(json_decode(file_get_contents('php://input')), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES). \"\\\\n\\\\n\", FILE_APPEND) ?>" > .travis-ci/report-uri.php
-- touch .travis-ci/csp-reports.txt
-- printf "include_path = $(pwd)" > .travis-ci/php-conf-csp.ini
-- phpenv config-add .travis-ci/php-conf-csp.ini
-- php -S localhost:8080 &
+
+#Create a basic CSP report handler
+#NOTE: This report handler code is not secure and should not be used on any internet-facing server or for production use.
+#In this case it is acceptable as it is only processing locally-generated data in a single-use/disposable VM environment.
+- printf "<?php file_put_contents('csp-reports.txt', json_encode(json_decode(file_get_contents('php://input')), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES). \"\\\\n\\\\n\", FILE_APPEND) ?>" > report-uri.php
+
+#Create reports output file to prevent build failing if no reports are generated
+- touch csp-reports.txt
+
+#Add required PHP configurations below
+- printf "include_path = $(pwd)" > php-conf-csp.ini
+- phpenv config-add php-conf-csp.ini
+
+#Start basic PHP web server, and redirect all output to /dev/null
+- php -S localhost:8080 > /dev/null &2>1 &
+
+#Wait for detached web server to start
 - sleep 3
-script: chmod +x .travis-ci/build.sh && ./.travis-ci/build.sh
+
+#Start the build script
+script: chmod +x build.sh && build.sh
