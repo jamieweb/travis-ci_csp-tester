@@ -13,23 +13,15 @@ If any CSP violation reports are received by the local report handler, they are 
 
 ## How do I set it up?
 
-Put the files from this repository into your the root of your GitHub repository. If you wish to keep them separate, you can put them in a directory such as `.travis-ci`.
-
-The files that will be present permanently are:
-
-* .travis.yml
-* build.sh
-* crawl.js
-* csp.txt
-* blocked-uri-exclusions.txt
-* document-uri-exclusions.txt
-
-The following files will be created during the build on Travis-CI. These will never exist in your actual repository, but still watch out for possible file name collisions:
-
-* crawled.csv
-* csp-reports.txt
+Put the files from this repository into your the root of your GitHub repository. If you wish to keep them separate, you can put them in a directory such as `.travis-ci`, however you'll have to update references to them in `.travis.yml`, `build.sh` and `crawl.js`.
 
 Theoretically this *should* work out-of-the-box for simple PHP websites, however you will most likely have to perform some tweaking in order to get it running.
+
+Each of the files have relevant comments in order to help you identify where adjustments might need to be made.
+
+* `.travis.yml` : The Travis-CI build configuration. Installs and configures the required resources and software, then starts the local web server.
+* `build.sh` : Starts the crawler and reports on the results.
+* `crawl.js` : The crawler itself.
 
 In the `.travis.yml` file, there is a place for you to set any required PHP configuration values, such as `include_path`, `default_mimetype`, etc.
 
@@ -54,3 +46,21 @@ For example to exclude the following `blocked-uri` values:
 Make sure to use the localhost address of the value to exclude as this is what the report will contain - not your real website address.
 
 You can use either file or both at the same time, the script checks inside both of them for each report.
+
+## File Names
+
+Watch out for possible file name collisions. You can freely rename these if required as long as you also update references to them in `.travis.yml`, `build.sh` and `crawl.js`.
+
+The files that will be present permanently are:
+
+* .travis.yml
+* build.sh
+* crawl.js
+* csp.txt
+* blocked-uri-exclusions.txt
+* document-uri-exclusions.txt
+
+The following files will be created during the build on Travis-CI. These will never exist in your actual repository, but still watch out for possible file name collisions:
+
+* crawled.csv
+* csp-reports.txt
