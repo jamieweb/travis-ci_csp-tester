@@ -26,17 +26,18 @@ before_script:
 #Create a basic CSP report handler
 #NOTE: This report handler code is not secure and should not be used on any internet-facing server or for production use.
 #In this case it is acceptable as it is only processing locally-generated data in a single-use/disposable VM environment.
-- printf "<?php file_put_contents('csp-reports.txt', json_encode(json_decode(file_get_contents('php://input')), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES). \"\\\\n\\\\n\", FILE_APPEND) ?>" > report-uri.php
+- printf "<?php \$report = json_decode(file_get_contents('php://input')); if((in_array(\$report->{'csp-report'}->{'blocked-uri'}, array_map('trim', file('blocked-uri-exclusions.txt')))) || (in_array(\$report->{'csp-report'}->{'document-uri'}, array_map('trim', file('document-uri-exclusions.txt'))))) { exit(); } else { file_put_contents('csp-reports.txt', json_encode(\$report, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . \"\\\\n\\\\n\", FILE_APPEND); } ?>" > report-uri.php
 
-#Create reports output file to prevent build failing if no reports are generated
-- touch csp-reports.txt
+#Create configuration files to prevent errors if they do not exist
+- touch csp-reports.txt blocked-uri-exclusions.txt document-uri-exclusions.txt
 
 #Add required PHP configurations below
 - printf "include_path = $(pwd)" > php-conf-csp.ini
 - phpenv config-add php-conf-csp.ini
 
-#Start basic PHP web server, and redirect all output to /dev/null
-- php -S localhost:8080 > /dev/null &2>1 &
+#Start basic PHP web server
+#NOTE: If you wish, you can hide all output using 'php -S localhost:8080 > /dev/null 2>&1 &', however it is only recommended to do this once you are sure there are no PHP errors occuring.
+- php -S localhost:8080 &
 
 #Wait for detached web server to start
 - sleep 3
