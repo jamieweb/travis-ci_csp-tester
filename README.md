@@ -13,7 +13,7 @@ If any CSP violation reports are received by the local report handler, they are 
 
 ## How do I set it up?
 
-Put the files from this repository into your the root of your GitHub repository. If you wish to keep them separate, you can put them in a directory such as `.travis-ci`, however you'll have to update references to them in `.travis.yml`, `build.sh` and `crawl.js`.
+Put the files from this repository into the root of your GitHub repository. If you wish to keep them separate, you can put them in a directory such as `.travis-ci`, however you'll have to update references to them in `.travis.yml`, `build.sh` and `crawl.js`.
 
 Theoretically this *should* work out-of-the-box for simple PHP websites, however you will most likely have to perform some tweaking in order to get it running.
 
