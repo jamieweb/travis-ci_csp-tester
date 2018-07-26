@@ -26,7 +26,7 @@ before_script:
 #Create a basic CSP report handler
 #NOTE: This report handler code is not secure and should not be used on any internet-facing server or for production use.
 #In this case it is acceptable as it is only processing locally-generated data in a single-use/disposable VM environment.
-- printf "<?php \$report = json_decode(filter_var(file_get_contents('php://input'), FILTER_DEFAULT, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH)); if((in_array(\$report->{'csp-report'}->{'blocked-uri'}, array_map('trim', file('blocked-uri-exclusions.txt')))) || (in_array(\$report->{'csp-report'}->{'document-uri'}, array_map('trim', file('document-uri-exclusions.txt'))))) { exit(); } else { file_put_contents('csp-reports.txt', json_encode(\$report, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . \"\\\\n\\\\n\", FILE_APPEND); } ?>" > report-uri.php
+- printf "<?php \$report = json_decode(filter_var(file_get_contents('php://input'), FILTER_DEFAULT, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH)); if(json_last_error() !== JSON_ERROR_NONE { exit(); } elseif((in_array(\$report->{'csp-report'}->{'blocked-uri'}, array_map('trim', file('blocked-uri-exclusions.txt')))) || (in_array(\$report->{'csp-report'}->{'document-uri'}, array_map('trim', file('document-uri-exclusions.txt'))))) { exit(); } else { file_put_contents('csp-reports.txt', json_encode(\$report, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . \"\\\\n\\\\n\", FILE_APPEND); } ?>" > report-uri.php
 
 #Create configuration files to prevent errors if they do not exist
 - touch csp-reports.txt blocked-uri-exclusions.txt document-uri-exclusions.txt
