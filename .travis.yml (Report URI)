@@ -1,0 +1,51 @@
+language: php
+php:
+  - 7.2
+env:
+  - DOMAIN="jamieweb.net" #Your website's domain name
+before_install:
+#Set up your build subdomain to resolve to localhost
+printf "\n127.0.0.1 build${TRAVIS_BUILD_NUMBER}.${DOMAIN}\n" | sudo tee -a /etc/hosts
+
+#Install Apache and libnss3-tools
+- sudo apt update
+- sudo apt install apache2 libnss3-tools
+
+#Install headless-chrome-crawler using the yarn package manager
+- yarn add --ignore-engines headless-chrome-crawler
+
+#Enable mod_headers, mod_proxy_http and mod_ssl
+- sudo a2enmod headers proxy_http ssl
+
+#Set up Apache as a reverse proxy (this is used to add the CSP header)
+- printf "ProxyPass \"/\" \"http://localhost:8080/\"\nProxyPassReverse \"/\" \"http://localhost:8080/\"\n" | sudo tee /etc/apache2/conf-available/csp.conf
+
+#Add your CSP to the Apache config
+- cat csp.txt | sudo tee -a /etc/apache2/conf-available/csp.conf
+- sudo a2enconf csp.conf
+- sudo service apache2 restart
+
+#Set up the PHP built-in server to host your content locally
+before_script:
+
+#Create a basic CSP report handler
+#NOTE: This report handler code is not secure and should not be used on any internet-facing server or for production use.
+#In this case it is acceptable as it is only processing locally-generated data in a single-use/disposable VM environment.
+- printf "<?php \$report = json_decode(filter_var(file_get_contents('php://input'), FILTER_DEFAULT, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH)); if(json_last_error() !== JSON_ERROR_NONE) { exit(); } elseif((in_array(\$report->{'csp-report'}->{'blocked-uri'}, array_map('trim', file('blocked-uri-exclusions.txt')))) || (in_array(\$report->{'csp-report'}->{'document-uri'}, array_map('trim', file('document-uri-exclusions.txt'))))) { exit(); } else { file_put_contents('csp-reports.txt', json_encode(\$report, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . \"\\\\n\\\\n\", FILE_APPEND); } ?>" > report-uri.php
+
+#Create configuration files to prevent errors if they do not exist
+- touch csp-reports.txt blocked-uri-exclusions.txt document-uri-exclusions.txt
+
+#Add required PHP configurations below
+- printf "include_path = $(pwd)" > php-conf-csp.ini
+- phpenv config-add php-conf-csp.ini
+
+#Start basic PHP web server
+#NOTE: If you wish, you can hide all output using 'php -S localhost:8080 > /dev/null 2>&1 &', however it is only recommended to do this once you are sure there are no PHP errors occuring.
+- php -S localhost:8080 &
+
+#Wait for detached web server to start
+- sleep 3
+
+#Start the build script
+script: chmod +x build.sh && ./build.sh
