@@ -36,7 +36,7 @@ before_install:
 #Configure Apache to serve the self-signed certificate
 - sudo mv "build${TRAVIS_BUILD_NUMBER}.${DOMAIN}.crt" /etc/ssl/certs/
 - sudo mv "build${TRAVIS_BUILD_NUMBER}.${DOMAIN}.key" /etc/ssl/private/
-- printf "<VirtualHost _default_:443>\nSSLEngine on\nSSLCertificateFile /etc/ssl/certs/build${TRAVIS_BUILD_NUMBER}.${DOMAIN}.crt\nSSLCertificateKeyFile /etc/ssl/private/build${TRAVIS_BUILD_NUMBER}.${DOMAIN}.key\n</VirtualHost> | sudo tee /etc/apache2/sites-available/tls.conf
+- printf "<VirtualHost _default_:443>\nSSLEngine on\nSSLCertificateFile /etc/ssl/certs/build${TRAVIS_BUILD_NUMBER}.${DOMAIN}.crt\nSSLCertificateKeyFile /etc/ssl/private/build${TRAVIS_BUILD_NUMBER}.${DOMAIN}.key\n</VirtualHost>" | sudo tee /etc/apache2/sites-available/tls.conf
 - sudo a2ensite tls.conf
 
 #Restart Apache to apply changes
