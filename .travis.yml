@@ -43,4 +43,4 @@ before_script:
 - sleep 3
 
 #Start the build script
-script: chmod +x build.sh && ./build.sh
+script: chmod +x build.sh && ./build.sh localhost
