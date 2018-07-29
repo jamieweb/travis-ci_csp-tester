@@ -31,7 +31,7 @@ before_install:
 #Add the self-signed certificate to the NSS DB so that it is trusted by the crawler
 - mkdir -p "$HOME"/.pki/nssdb
 - certutil -d "$HOME"/.pki/nssdb -N --empty-password
-- certutil -d sql:"$HOME"/.pki/nssdb -A -t "P,," -n "build${TRAVIS_BUILD_NUMBER}.${DOMAIN}.crt" -i "build${TRAVIS_BUILD_NUMBER}.${DOMAIN}.key"
+- certutil -d sql:"$HOME"/.pki/nssdb -A -t "P,," -n "build${TRAVIS_BUILD_NUMBER}.${DOMAIN}.crt" -i "build${TRAVIS_BUILD_NUMBER}.${DOMAIN}.crt"
 
 #Configure Apache to serve the self-signed certificate
 - sudo mv "build${TRAVIS_BUILD_NUMBER}.${DOMAIN}.crt" /etc/ssl/certs/
