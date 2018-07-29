@@ -10,10 +10,10 @@ const exporter = new CSVExporter({
     const crawler = await HCCrawler.launch({
         maxDepth: 4, //Maximum recursion depth
         jQuery: false, //This is required to re-enable the CSP header in Puppeteer
-        allowedDomains: ['localhost'], //Array of permitted domains (without scheme)
+        allowedDomains: [process.argv[2]], //Array of permitted domains (without scheme)
         exporter //Export results as CSV to be printed in log
     });
-    await crawler.queue({ url: 'http://localhost/' });
+    await crawler.queue({ url: 'http://' + process.argv[2] + '/' });
     await crawler.onIdle();
     console.log("Crawler Done");
     await crawler.close();
