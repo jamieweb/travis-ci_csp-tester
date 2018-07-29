@@ -24,12 +24,22 @@ printf "\n127.0.0.1 build${TRAVIS_BUILD_NUMBER}.${DOMAIN}\n" | sudo tee -a /etc/
 - cat csp.txt | sudo tee -a /etc/apache2/conf-available/csp.conf
 - sudo a2enconf csp.conf
 
-#Generate a self signed certificate for your build-number subdomain
-- printf '\n[SAN]\nsubjectAltName=DNS:"${TRAVIS_BUILD_NUMBER}.${DOMAIN}"\n' | sudo tee -a /etc/ssl/openssl.cnf
-- openssl req -newkey rsa:2048 -x509 -nodes -keyout "${TRAVIS_BUILD_NUMBER}.${DOMAIN}.key" -new -out "${TRAVIS_BUILD_NUMBER}.${DOMAIN}.crt" -subj /CN="${TRAVIS_BUILD_NUMBER}.${DOMAIN}" -reqexts SAN -extensions SAN -config /etc/ssl/openssl.cnf -sha256 -days 2
+#Generate a self-signed certificate for your build-number subdomain
+- printf "\n[SAN]\nsubjectAltName=DNS:build${TRAVIS_BUILD_NUMBER}.${DOMAIN}\n" | sudo tee -a /etc/ssl/openssl.cnf
+- openssl req -newkey rsa:2048 -x509 -nodes -keyout "build${TRAVIS_BUILD_NUMBER}.${DOMAIN}.key" -new -out "build${TRAVIS_BUILD_NUMBER}.${DOMAIN}.crt" -subj /CN="${TRAVIS_BUILD_NUMBER}.${DOMAIN}" -reqexts SAN -extensions SAN -config /etc/ssl/openssl.cnf -sha256 -days 2
 
+#Add the self-signed certificate to the NSS DB so that it is trusted by the crawler
+- mkdir -p "$HOME"/.pki/nssdb
+- certutil -d "$HOME"/.pki/nssdb -N --empty-password
+- certutil -d sql:"$HOME"/.pki/nssdb -A -t "P,," -n "build${TRAVIS_BUILD_NUMBER}.${DOMAIN}.crt" -i "build${TRAVIS_BUILD_NUMBER}.${DOMAIN}.key"
 
+#Configure Apache to serve the self-signed certificate
+- sudo mv "build${TRAVIS_BUILD_NUMBER}.${DOMAIN}.crt" /etc/ssl/certs/
+- sudo mv "build${TRAVIS_BUILD_NUMBER}.${DOMAIN}.key" /etc/ssl/private/
+- printf "<VirtualHost _default_:443>\nSSLEngine on\nSSLCertificateFile /etc/ssl/certs/build${TRAVIS_BUILD_NUMBER}.${DOMAIN}.crt\nSSLCertificateKeyFile /etc/ssl/private/build${TRAVIS_BUILD_NUMBER}.${DOMAIN}.key\n</VirtualHost> | sudo tee /etc/apache2/sites-available/tls.conf
+- sudo a2ensite tls.conf
 
+#Restart Apache to apply changes
 - sudo service apache2 restart
 
 #Set up the PHP built-in server to host your content locally
@@ -55,4 +65,4 @@ before_script:
 - sleep 3
 
 #Start the build script
-script: chmod +x build.sh && ./build.sh
+script: chmod +x build.sh && ./build.sh "build${TRAVIS_BUILD_NUMBER}.${DOMAIN}"
