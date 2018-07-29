@@ -5,7 +5,7 @@ env:
   - DOMAIN="jamieweb.net" #Your website's domain name
 before_install:
 #Set up your build subdomain to resolve to localhost
-printf "\n127.0.0.1 build${TRAVIS_BUILD_NUMBER}.${DOMAIN}\n" | sudo tee -a /etc/hosts
+- printf "\n127.0.0.1 build${TRAVIS_BUILD_NUMBER}.${DOMAIN}\n" | sudo tee -a /etc/hosts
 
 #Install Apache and libnss3-tools
 - sudo apt update
