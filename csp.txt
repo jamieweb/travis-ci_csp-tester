@@ -1,3 +1,3 @@
 # Set the Content-Security-Policy header to test against here.
 # It should be in the Apache format, and have a report-uri of 'http://localhost/report-uri.php', or whatever the location of your report-uri.php file is.
-Header always set Content-Security-Policy: "default-src 'none'; report-uri http://localhost/report-uri.php"
+Header always set Content-Security-Policy: "default-src 'none'; report-uri https://jamieweb.report-uri.com/r/d/csp/enforce"
