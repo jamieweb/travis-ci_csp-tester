@@ -5,7 +5,7 @@ This is currently a **work in progress**.
 
 ## How does it work?
 
-A local copy of your website is run in the Travis-CI virtual machine. Your desired Content-Security-Policy header is served with the a `report-uri` directive configured to send CSP violation reports to a local report handler.
+A local copy of your website is automatically set up and run in a Travis-CI virtual machine. Your desired Content-Security-Policy header is served with the `report-uri` directive configured to send CSP violation reports to a local report handler and/or [Report URI](https://report-uri.com).
 
 Your website is then automatically crawled using [headless-chrome-crawler](https://github.com/yujiosaka/headless-chrome-crawler) by [yujiosaka](https://github.com/yujiosaka), which causes CSP violation reports to be sent where required.
 
@@ -22,10 +22,21 @@ Each of the files have relevant comments in order to help you identify where adj
 * `.travis.yml` : The Travis-CI build configuration. Installs and configures the required resources and software, then starts the local web server.
 * `build.sh` : Starts the crawler and reports on the results.
 * `crawl.js` : The crawler itself.
+* `csp.txt` : The Content Security Policy that you'd like to test your site against.
 
-In the `.travis.yml` file, there is a place for you to set any required PHP configuration values, such as `include_path`, `default_mimetype`, etc.
+**For a quick start, set your Content Security Policy in `csp.txt`, then configure the domain environment variable at the top of `.travis.yml`.**
+
+In the `.travis.yml` file, there is also a place for you to set any required PHP configuration values, such as `include_path`, `default_mimetype`, etc.
+
+## Report URI Integration
+
+If you wish to integrate this with your [Report URI](https://report-uri.com) account, add your Report URI CSP reporting address to the Content Security Policy in `csp.txt`. Ensure that your filters are set correctly in your Report URI account settings, and that Report URI is configured to allow reports for your domain.
+
+Each build uses a custom subdomain with the build number in the hostname, for example `build123.example.tld`. You can filter for the desired build number subdomain in the Report URI interface in order to see the reports for that particular build.
 
 ## False Positives
+
+**This feature is currently being re-worked and is not currently working.**
 
 Sometimes the browser will produce false-positive reports. This is not the fault of this setup or the crawler, but of Chrome/Chromium itself.
 
