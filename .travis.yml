@@ -2,9 +2,11 @@ language: php
 php:
   - 7.2
 env:
-  - DOMAIN="jamieweb.net" #Your website's domain name
-  - CSP="default-src 'none'" #The Content Security Policy to test against (**without** a report-uri directive)
-  - REPORT_URI_SUBDOMAIN="jamieweb" #Your report-uri.com subdomain/username (optional, leave blank if you don't want to use Report URI)
+  global:
+    - DOMAIN="jamieweb.net" #Your website's domain name
+    - CSP="default-src 'none'" #The Content Security Policy to test against (**without** a report-uri directive)
+    - REPORT_URI_SUBDOMAIN="jamieweb" #Your report-uri.com subdomain/username (optional, leave blank if you don't want to use Report URI)
+
 before_install:
 #Set up your build subdomain to resolve to localhost
 - printf "\n127.0.0.1 build${TRAVIS_BUILD_NUMBER}.${DOMAIN}\n" | sudo tee -a /etc/hosts
