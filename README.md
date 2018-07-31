@@ -1,8 +1,6 @@
 # travis-ci_csp-tester
 A Travis-CI configuration for automatically testing your PHP website for Content Security Policy violations.
 
-This is currently a **work in progress**.
-
 ## How does it work?
 
 A local copy of your website is automatically set up and run in a Travis-CI virtual machine. Your desired Content-Security-Policy header is served with the `report-uri` directive configured to send CSP violation reports to a local report handler and/or [Report URI](https://report-uri.com).
@@ -54,6 +52,8 @@ For example, to exclude the following `blocked-uri` values:
 You do not need to include the scheme, hostname or domain. Just the path is required like in the examples above. If you want to exclude the root path (i.e. the homepage), just put `/` into the relevant exclusions file.
 
 You can use either file or both at the same time, the script checks inside both of them for each report.
+
+**Note that this will not exclude reports from Report URI, only from the build log output.**
 
 ## File Names
 
