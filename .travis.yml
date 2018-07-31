@@ -26,7 +26,7 @@ before_install:
 
 #Add your CSP to the Apache config
 - printf "Header always set Content-Security-Policy \"${CSP}; report-uri https://build${TRAVIS_BUILD_NUMBER}.${DOMAIN}/report-uri.php" | sudo tee -a /etc/apache2/conf-available/csp.conf
-- if [ -n "$REPORT_URI_USERNAME" ]; then printf " https://${REPORT_URI_USERNAME}.report-uri.com/r/d/csp/enforce\"" | sudo tee -a /etc/apache2/conf-available/csp.conf; else printf "\"" | sudo tee -a /etc/apache2/conf-available/csp.conf; fi
+- if [ -n "$REPORT_URI_SUBDOMAIN" ]; then printf " https://${REPORT_URI_SUBDOMAIN}.report-uri.com/r/d/csp/enforce\"" | sudo tee -a /etc/apache2/conf-available/csp.conf; else printf "\"" | sudo tee -a /etc/apache2/conf-available/csp.conf; fi
 - sudo a2enconf csp.conf
 - cat /etc/apache2/conf-available/csp.conf
 
