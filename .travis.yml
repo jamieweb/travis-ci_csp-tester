@@ -3,6 +3,8 @@ php:
   - 7.2
 env:
   - DOMAIN="jamieweb.net" #Your website's domain name
+  - CSP="default-src 'none'" #The Content Security Policy to test against (**without** a report-uri directive)
+  - REPORT_URI_SUBDOMAIN="jamieweb" #Your report-uri.com subdomain/username (optional, leave blank if you don't want to use Report URI)
 before_install:
 #Set up your build subdomain to resolve to localhost
 - printf "\n127.0.0.1 build${TRAVIS_BUILD_NUMBER}.${DOMAIN}\n" | sudo tee -a /etc/hosts
@@ -21,8 +23,10 @@ before_install:
 - printf "ProxyPass \"/\" \"http://localhost:8080/\"\nProxyPassReverse \"/\" \"http://localhost:8080/\"\n" | sudo tee /etc/apache2/conf-available/csp.conf
 
 #Add your CSP to the Apache config
-- cat csp.txt | sudo tee -a /etc/apache2/conf-available/csp.conf
+- printf "Header always set \"${CSP}; report-uri https://build${TRAVIS_BUILD_NUMBER}.${DOMAIN}/report-uri.php" | sudo tee -a /etc/apache2/conf-available/csp.conf
+- if [ -n "$REPORT_URI_USERNAME" ]; then printf " https://${REPORT_URI_USERNAME}.report-uri.com/r/d/csp/enforce\"" | sudo tee -a /etc/apache2/conf-available/csp.conf; else printf "\"" | sudo tee -a /etc/apache2/conf-available/csp.conf
 - sudo a2enconf csp.conf
+- cat /etc/apache2/conf-available/csp.conf
 
 #Generate a self-signed certificate for your build-number subdomain
 - printf "\n[SAN]\nsubjectAltName=DNS:build${TRAVIS_BUILD_NUMBER}.${DOMAIN}\n" | sudo tee -a /etc/ssl/openssl.cnf
@@ -55,7 +59,7 @@ before_script:
 
 #Prepend build number subdomain to exclusion config files
 - if [ -s blocked-uri-exclusions.txt ]; then sed -i "s/^/https:\/\/build${TRAVIS_BUILD_NUMBER}.${DOMAIN}/" blocked-uri-exclusions.txt; fi
-- if [ -s document-uri-exclusions.txt ]; then sed -i "s/^https:\/\/build${TRAVIS_BUILD_NUMBER}.${DOMAIN}/" document-uri-exclusions.txt; fi
+- if [ -s document-uri-exclusions.txt ]; then sed -i "s/^/https:\/\/build${TRAVIS_BUILD_NUMBER}.${DOMAIN}/" document-uri-exclusions.txt; fi
 - cat blocked-uri-exclusions.txt
 - cat document-uri-exclusions.txt
 
