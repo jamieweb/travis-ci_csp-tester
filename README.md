@@ -36,25 +36,23 @@ Each build uses a custom subdomain with the build number in the hostname, for ex
 
 ## False Positives
 
-**This feature is currently being re-worked and is not currently working.**
-
 Sometimes the browser will produce false-positive reports. This is not the fault of this setup or the crawler, but of Chrome/Chromium itself.
 
 For example, my RSS feed and security.txt file triggers a CSP violation report for inline styling, even though no inline styling is present in either file.
 
-You can exclude reports containing certain `blocked-uri` or `document-uri` values, using the files `blocked-uri-exclusions.txt` and `document-uri-exclusions.txt`. Simply list the entire false-positive value, one per line.
+You can exclude reports containing certain `blocked-uri` or `document-uri` values, using the files `blocked-uri-exclusions.txt` and `document-uri-exclusions.txt`. Simply list the path of the false-positive, one per line.
 
-For example to exclude the following `blocked-uri` values:
+For example, to exclude the following `blocked-uri` values:
 
-    http://localhost/image1.png
-    http://localhost/style.css
+    /image1.png
+    /style.css
     
 ...and to exclude entire `document-uri` values:
 
-    http://localhost/page1/
-    http://localhost/page2/
+    /page1/
+    /page2/
     
-Make sure to use the localhost address of the value to exclude as this is what the report will contain - not your real website address.
+You do not need to include the scheme, hostname or domain. Just the path is required like in the examples above.
 
 You can use either file or both at the same time, the script checks inside both of them for each report.
 
