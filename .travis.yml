@@ -53,6 +53,12 @@ before_script:
 #Create configuration files to prevent errors if they do not exist
 - touch csp-reports.txt blocked-uri-exclusions.txt document-uri-exclusions.txt
 
+#Prepend build number subdomain to exclusion config files
+- if [ -s blocked-uri-exclusions.txt ]; then sed -i "s/^/https:\/\/build${TRAVIS_BUILD_NUMBER}.${DOMAIN}/" blocked-uri-exclusions.txt; fi
+- if [ -s document-uri-exclusions.txt ]; then sed -i "s/^https:\/\/build${TRAVIS_BUILD_NUMBER}.${DOMAIN}/" document-uri-exclusions.txt; fi
+- cat blocked-uri-exclusions.txt
+- cat document-uri-exclusions.txt
+
 #Add required PHP configurations below
 - printf "include_path = $(pwd)" > php-conf-csp.ini
 - phpenv config-add php-conf-csp.ini
