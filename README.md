@@ -22,9 +22,8 @@ Each of the files have relevant comments in order to help you identify where adj
 * `.travis.yml` : The Travis-CI build configuration. Installs and configures the required resources and software, then starts the local web server.
 * `build.sh` : Starts the crawler and reports on the results.
 * `crawl.js` : The crawler itself.
-* `csp.txt` : The Content Security Policy that you'd like to test your site against.
 
-**For a quick start, set your Content Security Policy in `csp.txt`, then configure the domain environment variable at the top of `.travis.yml`.**
+**For a quick start, just configure the environment variables at the top of `.travis.yml`.**
 
 In the `.travis.yml` file, there is also a place for you to set any required PHP configuration values, such as `include_path`, `default_mimetype`, etc.
 
@@ -52,7 +51,7 @@ For example, to exclude the following `blocked-uri` values:
     /page1/
     /page2/
     
-You do not need to include the scheme, hostname or domain. Just the path is required like in the examples above.
+You do not need to include the scheme, hostname or domain. Just the path is required like in the examples above. If you want to exclude the root path (i.e. the homepage), just put `/` into the relevant exclusions file.
 
 You can use either file or both at the same time, the script checks inside both of them for each report.
 
@@ -65,7 +64,6 @@ The files that will be present permanently are:
 * .travis.yml
 * build.sh
 * crawl.js
-* csp.txt
 * blocked-uri-exclusions.txt
 * document-uri-exclusions.txt
 
