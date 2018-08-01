@@ -9,7 +9,6 @@ env:
 
 before_install:
 #Set up your build subdomain to resolve to localhost
-- cat null.txt #Temporary build fail trigger
 - printf "\n127.0.0.1 build${TRAVIS_BUILD_NUMBER}.${DOMAIN}\n" | sudo tee -a /etc/hosts
 
 #Install Apache and libnss3-tools
@@ -75,4 +74,4 @@ before_script:
 - sleep 3
 
 #Start the build script
-script: chmod +x build.sh && ./build.sh "build${TRAVIS_BUILD_NUMBER}.${DOMAIN}"
+script: chmod +x build.sh && ./build.sh "build${TRAVIS_BUILD_NUMBER}.${DOMAIN}" && false
