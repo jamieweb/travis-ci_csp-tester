@@ -74,4 +74,4 @@ before_script:
 - sleep 3
 
 #Start the build script
-script: chmod +x build.sh && ./build.sh "build${TRAVIS_BUILD_NUMBER}.${DOMAIN}" && false
+script: chmod +x build.sh && ./build.sh "build${TRAVIS_BUILD_NUMBER}.${DOMAIN}"
