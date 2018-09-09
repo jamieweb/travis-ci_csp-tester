@@ -27,7 +27,7 @@ In the `.travis.yml` file, there is also a place for you to set any required PHP
 
 ## Report URI Integration
 
-If you wish to integrate this with your [Report URI](https://report-uri.com) account, you can configure your Report URI subdomain in the variables at the top of `.travis-ci.yml`. Ensure that your filters are set correctly in your Report URI account settings, and that Report URI is configured to allow reports for your domain.
+If you wish to integrate this with your [Report URI](https://report-uri.com) account, you can configure your Report URI subdomain in the variables at the top of `.travis.yml`. Ensure that your filters are set correctly in your Report URI account settings, and that Report URI is configured to allow reports for your domain.
 
 Each build uses a custom subdomain with the build number in the hostname, for example `build123.example.tld`. You can filter for the desired build number subdomain in the Report URI interface in order to see the reports for that particular build.
 
